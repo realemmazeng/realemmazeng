@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#fbf8f6" />
+    <title>emma zeng ♡</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter+Tight:wght@400;600;800&family=Pinyon+Script&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="is-loading">
+    <!-- shared gummy star + photo filter -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <defs>
+        <!-- chubby star: fat inner radius + thick round stroke = soft rounded points -->
+        <symbol id="gummy" viewBox="0 0 100 100">
+          <path
+            style="fill: var(--jelly); stroke: var(--jelly)"
+            d="M50 12 L61.2 34.6 L86.1 38.3 L68.1 55.9 L72.3 80.7 L50 69 L27.7 80.7 L31.9 55.9 L13.9 38.3 L38.8 34.6 Z"
+            stroke-linejoin="round"
+            stroke-width="20"
+          />
+        </symbol>
+
+        <!-- cream star button with a pink 4-hole button in the middle (link icons) -->
+        <radialGradient id="star-cream" cx="40%" cy="35%" r="70%">
+          <stop offset="0" stop-color="#fdf6d8" />
+          <stop offset="1" stop-color="#f3e3a6" />
+        </radialGradient>
+        <radialGradient id="button-pink" cx="40%" cy="35%" r="70%">
+          <stop offset="0" stop-color="#fff6f3" />
+          <stop offset="1" stop-color="#efd2cc" />
+        </radialGradient>
+        <symbol id="star-button" viewBox="0 0 100 100">
+          <path d="M50 12 L61.2 34.6 L86.1 38.3 L68.1 55.9 L72.3 80.7 L50 69 L27.7 80.7 L31.9 55.9 L13.9 38.3 L38.8 34.6 Z" fill="url(#star-cream)" stroke="url(#star-cream)" stroke-width="20" stroke-linejoin="round" />
+          <!-- raised rim just inside the edge -->
+          <path d="M50 12 L61.2 34.6 L86.1 38.3 L68.1 55.9 L72.3 80.7 L50 69 L27.7 80.7 L31.9 55.9 L13.9 38.3 L38.8 34.6 Z" transform="translate(50 50) scale(0.8) translate(-50 -50)"
+            fill="none" stroke="#fffaf0" stroke-opacity="0.8" stroke-width="3" stroke-linejoin="round" />
+          <circle cx="50" cy="51" r="17" fill="url(#button-pink)" stroke="#e8c9c2" stroke-width="1.5" />
+          <circle cx="50" cy="51" r="12.5" fill="none" stroke="#e8c9c2" stroke-opacity="0.6" stroke-width="1" />
+          <g fill="#c9a07a">
+            <circle cx="45.5" cy="46.5" r="2.8" /><circle cx="54.5" cy="46.5" r="2.8" />
+            <circle cx="45.5" cy="55.5" r="2.8" /><circle cx="54.5" cy="55.5" r="2.8" />
+          </g>
+          <ellipse cx="43" cy="40" rx="5" ry="2.4" fill="#fff" opacity="0.8" transform="rotate(-25 43 40)" />
+        </symbol>
+        <!-- cool, pale color grade for the id photo (less warm/yellow, slightly desaturated) -->
+        <filter id="cool" color-interpolation-filters="sRGB">
+          <feColorMatrix type="saturate" values="0.82" />
+          <feComponentTransfer>
+            <feFuncR type="linear" slope="0.93" intercept="0.02" />
+            <feFuncG type="linear" slope="0.98" intercept="0.03" />
+            <feFuncB type="linear" slope="1.04" intercept="0.06" />
+          </feComponentTransfer>
+        </filter>
+      </defs>
+    </svg>
+
+    <!-- intro loader -->
+    <div class="loader" id="loader" role="status" aria-live="polite">
+      <div class="loader-card">
+        <img class="loader-gif" src="assets/chiikawa-duo.gif" alt="" />
+        <p class="loader-text">loading emma's little world<span class="dots"></span></p>
+        <div class="loader-stars" aria-hidden="true">
+          <svg><use href="#gummy" /></svg>
+          <svg><use href="#gummy" /></svg>
+          <svg><use href="#gummy" /></svg>
+          <svg><use href="#gummy" /></svg>
+          <svg><use href="#gummy" /></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="floaties" id="floaties" aria-hidden="true"></div>
+
+    <header class="nav-wrap">
+      <nav class="nav" aria-label="sections">
+        <button class="nav-btn is-active" data-go="home">home</button>
+        <button class="nav-btn" data-go="projects">projects</button>
+        <button class="nav-btn" data-go="about">about</button>
+      </nav>
+    </header>
+
+    <main>
+      <!-- HOME -->
+      <section class="page is-shown" id="home" aria-labelledby="home-title">
+        <div class="hero">
+          <img class="bear bear-a" src="assets/bear.png" alt="" aria-hidden="true" />
+          <img class="bear bear-b" src="assets/bear.png" alt="" aria-hidden="true" />
+
+          <div class="photo-frame">
+            <svg class="photo" viewBox="0 0 300 300" role="img" aria-label="photo of emma">
+              <defs>
+                <clipPath id="id-round"><rect width="300" height="300" rx="14" /></clipPath>
+              </defs>
+              <image href="assets/pfp.jpg" width="300" height="300" preserveAspectRatio="xMidYMid slice"
+                clip-path="url(#id-round)" filter="url(#cool)" />
+            </svg>
+
+            <h1 id="home-title" class="script">Emma Zeng</h1>
+
+            <div class="hero-intro">
+              <p>
+                Hi, I'm Emma! I'm an undergraduate student at the
+                <span class="hl">University of Southern California</span>, and I'm currently a
+                <span class="hl">game dev</span> intern at Alterea Inc. I'm also one of the organizers for AthenaHacks 2027.
+              </p>
+              <div class="sew-row">
+                <a class="sew-btn" href="#" target="_blank" rel="noopener"><svg class="sew-icon" aria-hidden="true"><use href="#star-button" /></svg>linkedin</a>
+                <a class="sew-btn" href="https://github.com/realemmazeng" target="_blank" rel="noopener"><svg class="sew-icon" aria-hidden="true"><use href="#star-button" /></svg>github</a>
+                <a class="sew-btn" href="#"><svg class="sew-icon" aria-hidden="true"><use href="#star-button" /></svg>email</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROJECTS -->
+      <section class="page" id="projects" aria-labelledby="projects-title" hidden>
+        <h2 id="projects-title">projects</h2>
+        <div class="cards">
+          <article class="card" style="--tilt: -2deg">
+            <div class="tape"></div>
+            <img class="card-art" src="assets/safety-path.jpg" alt="Safety Path at USC title slide" />
+            <p class="card-meta">October 2026</p>
+            <h3>Safety Path</h3>
+            <p>
+              A walking-route web app for the USC area that picks safer paths using street
+              lighting, recent crime, foot traffic and DPS patrol coverage, with live rerouting
+              and an SOS button.
+            </p>
+            <p class="card-tech">Python · JavaScript · OpenStreetMap</p>
+            <div class="card-links">
+              <a class="card-link" href="https://github.com/realemmazeng/trojanhacks" target="_blank" rel="noopener">github</a>
+              <a class="card-link" href="https://drive.google.com/file/d/1BoYSi-l-SrhrLN3uiRx8ttMXxvX26Hpg/view?usp=sharing" target="_blank" rel="noopener" data-video="assets/safety-path-demo.mp4">demo video</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+
+      <!-- ABOUT -->
+      <section class="page" id="about" aria-labelledby="about-title" hidden>
+        <h2 id="about-title">about</h2>
+
+        <div class="about-head">
+          <figure class="motto">
+            <figcaption>a note to self</figcaption>
+            <blockquote>
+              Focus on what's within your control, and practice a healthy amount of voluntary discomfort.
+            </blockquote>
+          </figure>
+          <img class="about-chiikawa" src="assets/cute-character.gif" alt="" aria-hidden="true" />
+        </div>
+
+        <!-- spotify, via last.fm scrobbles; script.js fills it in and keeps it fresh -->
+        <div class="now-playing" id="nowPlaying" hidden>
+          <img class="np-art" alt="" />
+          <div class="np-info">
+            <p class="np-label">last played</p>
+            <a class="np-track" target="_blank" rel="noopener"></a>
+            <p class="np-artist"></p>
+          </div>
+        </div>
+
+        <p class="sign-off">thanks for taking the time to explore my website, random stranger</p>
+      </section>
+    </main>
+
+    <!-- demo video pop-up -->
+    <dialog class="video-modal" id="videoModal" aria-label="demo video">
+      <button class="video-close" type="button" aria-label="close video">×</button>
+      <div class="video-frame">
+        <iframe title="demo video" allow="autoplay; fullscreen" allowfullscreen hidden></iframe>
+        <video controls playsinline hidden></video>
+      </div>
+    </dialog>
+
+    <script src="script.js"></script>
+  </body>
+</html>
