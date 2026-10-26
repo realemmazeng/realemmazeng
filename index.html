@@ -73,14 +73,13 @@
     <!-- intro loader -->
     <div class="loader" id="loader" role="status" aria-live="polite">
       <div class="loader-card">
-        <img class="loader-gif" src="assets/chiikawa-duo.gif" alt="" />
-        <p class="loader-text">loading emma's little world<span class="dots"></span></p>
-        <div class="loader-stars" aria-hidden="true">
-          <svg><use href="#gummy" /></svg>
-          <svg><use href="#gummy" /></svg>
-          <svg><use href="#gummy" /></svg>
-          <svg><use href="#gummy" /></svg>
-          <svg><use href="#gummy" /></svg>
+        <img class="loader-gif" src="assets/chiikawa-wave.gif" alt="" />
+        <p class="loader-text">emma's little world<span class="dots"></span></p>
+        <!-- game-style xp bar; script.js fills it while the page loads -->
+        <div class="xp" aria-hidden="true">
+          <span class="xp-tag">loading</span>
+          <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+          <span class="xp-num" id="xpNum">0%</span>
         </div>
       </div>
     </div>
@@ -146,7 +145,7 @@
         <h2 id="projects-title">projects</h2>
         <div class="cards">
           <article class="card" style="--tilt: -2deg">
-            <div class="tape"></div>
+            <img class="patch" src="assets/heart-patch.png" alt="" aria-hidden="true" />
             <img class="card-art" src="assets/safety-path.jpg" alt="Safety Path at USC title slide" />
             <p class="card-meta">October 2026</p>
             <h3>Safety Path</h3>
@@ -184,7 +183,7 @@
 
         <!-- little music player; the song list lives in PLAYLIST in script.js -->
         <div class="player" id="player" hidden>
-          <p class="player-label">Fall picks</p>
+          <p class="player-label">favorite tracks</p>
           <div class="player-bar">
             <button class="pl-btn" type="button" data-pl="prev" aria-label="previous song">
               <svg viewBox="0 0 24 24"><path d="M11 6v12L2 12zM21 6v12l-9-6z" /></svg>

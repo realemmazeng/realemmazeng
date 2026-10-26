@@ -2,7 +2,7 @@
   --paper: #fbf8f6;
   --blush: #f5e8e7;
   --pink: #f3b8d3;
-  --pink-deep: #e58db8;
+  --pink-deep: #dfc6c8; /* dusty rose, from the threetimes site */
   --pink-soft: #fce1e7;
   --lilac: #e7c6f0;
   --ink: #2b2526;
@@ -18,10 +18,8 @@
   --bar-hover: rgba(255, 255, 255, 0.7); /* player buttons on the gray-pink bar */
   --shadow: rgba(43, 37, 38, 0.08);
   --glow-pink: rgba(229, 141, 184, 0.15);
-  --tape: rgba(243, 214, 224, 0.75);
   --bg-glow-a: #fdeef3;
   --bg-glow-b: #f4ecf8;
-  --jelly-off: #e8e3e4;
   --sheet: #fffdfb; /* the binder page everything sits on */
   color-scheme: light;
   --script: "Pinyon Script", "Snell Roundhand", cursive;
@@ -34,7 +32,7 @@
     --paper: #1b1618;
     --blush: #2e2528;
     --pink: #c9799f;
-    --pink-deep: #f0a3c8;
+    --pink-deep: #dfc6c8;
     --pink-soft: #4a2e3b;
     --lilac: #5a4563;
     --ink: #f4eaec;
@@ -48,11 +46,9 @@
   --bar: #d9b0bc;
     --shadow: rgba(0, 0, 0, 0.35);
     --glow-pink: rgba(240, 163, 200, 0.12);
-    --tape: rgba(240, 163, 200, 0.35);
     --bg-glow-a: #2a1c23;
     --bg-glow-b: #221c2b;
     --jelly: #7a4d61;
-    --jelly-off: #3a3134;
     --sheet: #241e21;
     color-scheme: dark;
   }
@@ -62,7 +58,7 @@
   --paper: #1b1618;
   --blush: #2e2528;
   --pink: #c9799f;
-  --pink-deep: #f0a3c8;
+  --pink-deep: #dfc6c8;
   --pink-soft: #4a2e3b;
   --lilac: #5a4563;
   --ink: #f4eaec;
@@ -76,11 +72,9 @@
   --bar: #d9b0bc;
   --shadow: rgba(0, 0, 0, 0.35);
   --glow-pink: rgba(240, 163, 200, 0.12);
-  --tape: rgba(240, 163, 200, 0.35);
   --bg-glow-a: #2a1c23;
   --bg-glow-b: #221c2b;
   --jelly: #7a4d61;
-  --jelly-off: #3a3134;
   --sheet: #241e21;
   color-scheme: dark;
 }
@@ -167,6 +161,7 @@ img {
 .loader-gif {
   width: 150px;
   height: auto;
+  margin-bottom: 10px;
 }
 
 .loader-text {
@@ -191,26 +186,60 @@ img {
   75% { content: "..."; }
 }
 
-.loader-stars {
+/* game-style xp bar: chunky pink fill split into segments, with a shine along the top */
+.xp {
   display: flex;
-  justify-content: center;
+  align-items: center;
   gap: 10px;
+  width: min(280px, 80vw);
+  margin: 0 auto;
 }
 
-.loader-stars svg {
-  width: 34px;
-  height: 34px;
-  transform: scale(0.8);
-  transition: transform 0.45s var(--squish);
+.xp-tag,
+.xp-num {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
-.loader-stars svg:not(.lit) {
-  --jelly: var(--jelly-off);
+.xp-tag {
+  color: var(--pink-deep);
 }
 
-.loader-stars svg.lit {
-  transform: scale(1.1);
-  animation: jiggle 0.6s ease;
+.xp-num {
+  width: 3.2em;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.xp-track {
+  flex: 1;
+  height: 20px;
+  padding: 3px;
+  border: 2px solid var(--pink);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.xp-fill {
+  width: 0;
+  height: 100%;
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 14px, rgba(255, 255, 255, 0.6) 14px 16px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45), transparent 55%),
+    linear-gradient(90deg, var(--pink-soft), var(--pink)); /* light pink */
+}
+
+/* a little bounce when it hits 100% */
+.loader.is-full .xp-track {
+  animation: level-up 0.45s var(--squish);
+}
+
+@keyframes level-up {
+  50% { transform: scale(1.06); }
 }
 
 /* ---------- floating stars ---------- */
@@ -659,16 +688,6 @@ body.is-loading .photo {
   transform: scale(0.96);
 }
 
-/* tape strips on the project cards */
-.tape {
-  position: absolute;
-  z-index: 2;
-  width: 90px;
-  height: 26px;
-  background: var(--tape);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
 /* the start of the name overlaps the photo's bottom-right corner; the rest runs off to the right */
 .script {
   position: absolute;
@@ -686,6 +705,20 @@ body.is-loading .photo {
   color: var(--name);
   text-shadow: 0 1px 2px rgba(120, 60, 85, 0.25);
   pointer-events: none;
+}
+
+/* the name writes itself out left to right once, as the loader opens (script.js adds .is-writing) */
+.script.is-writing {
+  -webkit-mask: linear-gradient(90deg, #000 0 40%, transparent 60%) 100% 0 / 250% 100% no-repeat;
+  mask: linear-gradient(90deg, #000 0 40%, transparent 60%) 100% 0 / 250% 100% no-repeat;
+  animation: write 2.2s cubic-bezier(0.45, 0, 0.35, 1) 0.5s forwards;
+}
+
+@keyframes write {
+  to {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
 }
 
 
@@ -746,7 +779,7 @@ body.is-loading .photo {
 /* matches the "a note to self" label */
 .player-label {
   margin: 0 0 8px;
-  color: var(--ink);
+  color: var(--mauve); /* matches "a note to self" */
   font-family: var(--sans);
   font-size: 15px;
   font-weight: 600;
@@ -985,7 +1018,8 @@ body.is-loading .photo {
   display: grid;
   /* fill, not fit: a lone card stays card-sized instead of stretching full width */
   grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 320px));
-  gap: 28px;
+  gap: 44px 28px; /* extra row space for the heart patches poking above each card */
+  padding-top: 18px;
 }
 
 .card {
@@ -1001,11 +1035,17 @@ body.is-loading .photo {
   transform: rotate(0) translateY(-6px) scale(1.02);
 }
 
-.card .tape {
-  top: -12px;
+/* puffy angel-wing heart patch pinned to the top of each card */
+.patch {
+  position: absolute;
+  top: -30px;
   left: 50%;
-  width: 80px;
-  transform: translateX(-50%) rotate(-4deg);
+  z-index: 2;
+  width: 68px;
+  height: auto;
+  filter: drop-shadow(0 3px 4px rgba(43, 37, 38, 0.15));
+  transform: translateX(-50%) rotate(-6deg);
+  pointer-events: none;
 }
 
 .card-art {

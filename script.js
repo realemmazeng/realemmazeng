@@ -6,32 +6,43 @@ const LOADER_MIN = 2200; // ms the loader stays up, even if the page is already 
 
 function runLoader() {
   const loader = document.getElementById("loader");
-  const stars = [...loader.querySelectorAll(".loader-stars svg")];
+  const fill = document.getElementById("xpFill");
+  const num = document.getElementById("xpNum");
+  const start = performance.now();
+  let loaded = document.readyState === "complete";
+  if (!loaded) window.addEventListener("load", () => (loaded = true), { once: true });
 
-  let lit = 0;
-  const cycle = setInterval(() => {
-    if (lit === stars.length) {
-      stars.forEach((s) => s.classList.remove("lit"));
-      lit = 0;
-    } else {
-      stars[lit++].classList.add("lit");
+  const setXp = (p) => {
+    fill.style.width = `${p}%`;
+    num.textContent = `${Math.round(p)}%`;
+  };
+
+  // eases up to 90% over LOADER_MIN, holds there if the page is still loading, then tops off
+  const tick = (now) => {
+    const t = Math.min((now - start) / LOADER_MIN, 1);
+    setXp(90 * (1 - (1 - t) ** 2));
+    if (t < 1 || !loaded) {
+      requestAnimationFrame(tick);
+      return;
     }
-  }, reduceMotion ? 120 : 320);
-
-  const minTime = new Promise((r) => setTimeout(r, LOADER_MIN));
-  const loaded = new Promise((r) =>
-    document.readyState === "complete" ? r() : window.addEventListener("load", r, { once: true })
-  );
-
-  Promise.all([minTime, loaded]).then(() => {
-    clearInterval(cycle);
-    stars.forEach((s) => s.classList.add("lit"));
+    setXp(100);
+    loader.classList.add("is-full");
     setTimeout(() => {
       loader.classList.add("is-done");
       document.body.classList.remove("is-loading");
       dropStars();
-    }, 350);
-  });
+      writeName();
+    }, 450);
+  };
+  requestAnimationFrame(tick);
+}
+
+// plays once; afterwards the mask comes off, so returning to home (or the page-turn copy) doesn't redraw it
+function writeName() {
+  const name = document.getElementById("home-title");
+  if (document.getElementById("home").hidden) return;
+  name.classList.add("is-writing");
+  name.addEventListener("animationend", () => name.classList.remove("is-writing"), { once: true });
 }
 
 /* ---------- floating gummy stars ---------- */
