@@ -1,53 +1,37 @@
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const rand = (min, max) => min + Math.random() * (max - min);
-/* ---------- intro loader (only shows if the page is slow) ---------- */
+/* ---------- intro loader (always plays once on entry) ---------- */
 
-const LOADER_DELAY = 400; // ms of waiting before the loader is worth showing
+const LOADER_MIN = 2200; // ms the loader stays up, even if the page is already loaded
 
 function runLoader() {
   const loader = document.getElementById("loader");
   const stars = [...loader.querySelectorAll(".loader-stars svg")];
-  let cycle;
 
-  const finish = () => {
-    loader.classList.add("is-done");
-    document.body.classList.remove("is-loading");
-    dropStars();
-  };
+  let lit = 0;
+  const cycle = setInterval(() => {
+    if (lit === stars.length) {
+      stars.forEach((s) => s.classList.remove("lit"));
+      lit = 0;
+    } else {
+      stars[lit++].classList.add("lit");
+    }
+  }, reduceMotion ? 120 : 320);
 
-  if (document.readyState === "complete") {
-    finish();
-    return;
-  }
-
-  // still loading after the delay: fade the loader in and loop the stars until we're done
-  const showTimer = setTimeout(() => {
-    loader.classList.add("is-visible");
-    let lit = 0;
-    cycle = setInterval(() => {
-      if (lit === stars.length) {
-        stars.forEach((s) => s.classList.remove("lit"));
-        lit = 0;
-      } else {
-        stars[lit++].classList.add("lit");
-      }
-    }, reduceMotion ? 120 : 320);
-  }, LOADER_DELAY);
-
-  window.addEventListener(
-    "load",
-    () => {
-      clearTimeout(showTimer);
-      if (!cycle) {
-        finish(); // loaded fast: the loader never appeared
-        return;
-      }
-      clearInterval(cycle);
-      stars.forEach((s) => s.classList.add("lit"));
-      setTimeout(finish, 350);
-    },
-    { once: true }
+  const minTime = new Promise((r) => setTimeout(r, LOADER_MIN));
+  const loaded = new Promise((r) =>
+    document.readyState === "complete" ? r() : window.addEventListener("load", r, { once: true })
   );
+
+  Promise.all([minTime, loaded]).then(() => {
+    clearInterval(cycle);
+    stars.forEach((s) => s.classList.add("lit"));
+    setTimeout(() => {
+      loader.classList.add("is-done");
+      document.body.classList.remove("is-loading");
+      dropStars();
+    }, 350);
+  });
 }
 
 /* ---------- floating gummy stars ---------- */
@@ -90,18 +74,82 @@ function setActive(target) {
   history.replaceState(null, "", target === "home" ? location.pathname : `#${target}`);
 }
 
-// every section is already on the page, so switching is instant (no loader needed)
+// pages in binder order: going right turns the page over, going left turns one back
+const ORDER = ["home", "projects", "about"];
+let endFlip = null;
+
+function showPage(page, rise) {
+  page.hidden = false;
+  page.classList.toggle("is-turned", !rise);
+  // restart the entrance animation
+  void page.offsetWidth;
+  page.classList.add("is-shown");
+}
+
+function hidePage(page) {
+  page.hidden = true;
+  page.classList.remove("is-shown", "is-turned");
+}
+
+// a still copy of a page for the turning leaf (no ids, nothing that loads or plays)
+function copyPage(page) {
+  const copy = page.cloneNode(true);
+  copy.removeAttribute("id");
+  copy.hidden = false;
+  copy.classList.remove("is-shown", "is-turned");
+  copy.querySelectorAll("[id]").forEach((el) => el.removeAttribute("id"));
+  copy.querySelectorAll("iframe, audio, video").forEach((el) => el.remove());
+  return copy;
+}
+
+function flipPage(prev, next, forward) {
+  const main = document.querySelector("main");
+  const leaf = document.createElement("div");
+  leaf.className = `leaf ${forward ? "is-away" : "is-back"}`;
+  leaf.setAttribute("aria-hidden", "true");
+  leaf.inert = true;
+  leaf.style.height = `${main.clientHeight}px`;
+
+  const front = document.createElement("div");
+  front.className = "leaf-face";
+  // forward: the old page lifts off the new one. back: the new page lands on the old one
+  front.appendChild(copyPage(forward ? prev : next));
+  const back = document.createElement("div");
+  back.className = "leaf-face leaf-back";
+  leaf.append(front, back);
+
+  if (forward) {
+    hidePage(prev);
+    showPage(next, true);
+  }
+  main.appendChild(leaf);
+
+  endFlip = () => {
+    endFlip = null;
+    clearTimeout(fallback);
+    if (!forward) {
+      hidePage(prev);
+      showPage(next, false);
+    }
+    leaf.remove();
+  };
+  leaf.addEventListener("animationend", (e) => e.target === leaf && endFlip?.());
+  const fallback = setTimeout(() => endFlip?.(), 1200); // in case animationend never fires
+}
+
 function go(target) {
   if (target === current) return;
+  endFlip?.(); // a fast second click finishes the turn already in progress
   const prev = document.getElementById(current);
   const next = document.getElementById(target);
-  prev.hidden = true;
-  prev.classList.remove("is-shown");
-  next.hidden = false;
-  // restart the entrance animation
-  void next.offsetWidth;
-  next.classList.add("is-shown");
-  window.scrollTo({ top: 0 });
+  window.scrollTo({ top: 0, behavior: "instant" });
+
+  if (reduceMotion) {
+    hidePage(prev);
+    showPage(next, true);
+  } else {
+    flipPage(prev, next, ORDER.indexOf(target) > ORDER.indexOf(current));
+  }
   setActive(target);
 }
 

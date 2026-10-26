@@ -22,6 +22,7 @@
   --bg-glow-a: #fdeef3;
   --bg-glow-b: #f4ecf8;
   --jelly-off: #e8e3e4;
+  --sheet: #fffdfb; /* the binder page everything sits on */
   color-scheme: light;
   --script: "Pinyon Script", "Snell Roundhand", cursive;
   --sans: "Inter Tight", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -52,6 +53,7 @@
     --bg-glow-b: #221c2b;
     --jelly: #7a4d61;
     --jelly-off: #3a3134;
+    --sheet: #241e21;
     color-scheme: dark;
   }
 }
@@ -79,6 +81,7 @@
   --bg-glow-b: #221c2b;
   --jelly: #7a4d61;
   --jelly-off: #3a3134;
+  --sheet: #241e21;
   color-scheme: dark;
 }
 
@@ -145,23 +148,15 @@ img {
   place-items: center;
   padding: 24px;
   background: var(--paper);
-  /* invisible until script.js decides the page is slow enough to need it */
-  opacity: 0;
-  pointer-events: none;
   transition:
-    opacity 0.25s ease,
     clip-path 0.9s cubic-bezier(0.7, 0, 0.2, 1),
     visibility 0s 0.9s;
   clip-path: circle(150% at 50% 50%);
 }
 
-.loader.is-visible {
-  opacity: 1;
-  pointer-events: auto;
-}
-
 .loader.is-done {
   visibility: hidden;
+  pointer-events: none;
   clip-path: circle(0% at 50% 50%);
 }
 
@@ -364,17 +359,177 @@ img {
 
 /* ---------- pages ---------- */
 
+/* main is one page of a ring binder; the pages behind it peek out at the right and bottom */
 main {
+  --sheet-pad: 32px 28px 80px 88px; /* extra room on the left for the rings */
   position: relative;
   z-index: 1;
   max-width: 1100px;
-  margin: 0 auto;
-  padding: 32px 20px 80px;
+  margin: 20px auto 56px;
+  padding: var(--sheet-pad);
+  border-radius: 6px 14px 14px 6px;
+  background: var(--sheet);
+  box-shadow:
+    3px 3px 0 -1px var(--sheet),
+    3px 3px 0 0 var(--line),
+    6px 6px 0 -1px var(--sheet),
+    6px 6px 0 0 var(--line),
+    0 18px 40px var(--shadow);
+  perspective: 2400px; /* for the page turn */
+}
+
+/* ---------- binder rings ---------- */
+
+/* rings sit at fixed distances from the top of the page, so they never shift when the page or window changes size */
+.binder {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -14px;
+  z-index: 3; /* above the turning page, so pages flip around the rings */
+  width: 64px;
+  pointer-events: none;
+}
+
+/* rings that would run past the bottom of the page are cut off here */
+.rings {
+  position: absolute;
+  inset: 48px -10px 40px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 38px;
+  overflow: hidden;
+}
+
+.binder::before {
+  position: absolute;
+  top: 24px;
+  bottom: 24px;
+  left: 4px;
+  width: 14px;
+  border-radius: 7px;
+  background: linear-gradient(90deg, #8d8d92, #f2f2f4 35%, #c4c4c9 60%, #7d7d83);
+  box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.25);
+  content: "";
+}
+
+.ring {
+  position: relative;
+  flex: none;
+  width: 58px;
+  height: 13px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffffff, #c9c9ce 45%, #8a8a90 70%, #e4e4e8);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* a wide gap between each group of three */
+.ring:nth-child(3n + 4) {
+  margin-top: 300px;
+}
+
+/* the punched hole the ring goes through */
+.ring::after {
+  position: absolute;
+  top: 50%;
+  right: -5px;
+  z-index: -1;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: inset 1px 2px 3px rgba(0, 0, 0, 0.3);
+  transform: translateY(-50%);
+  content: "";
+}
+
+/* ---------- page turn ---------- */
+
+/* a copy of a page that swings around the rings, built by flipPage() in script.js */
+.leaf {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  pointer-events: none;
+  animation: 0.9s cubic-bezier(0.45, 0.05, 0.3, 1) both;
+}
+
+.leaf.is-away {
+  animation-name: turn-away;
+}
+
+.leaf.is-back {
+  animation-name: turn-back;
+}
+
+.leaf-face {
+  position: absolute;
+  inset: 0;
+  padding: var(--sheet-pad);
+  border-radius: 6px 14px 14px 6px;
+  background: var(--sheet);
+  overflow: hidden;
+  backface-visibility: hidden;
+}
+
+.leaf-back {
+  transform: rotateY(180deg);
+}
+
+/* the page darkens a little as it lifts, like light falling across a curve */
+.leaf-face::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to left, rgba(43, 37, 38, 0.22), transparent 70%);
+  animation: shade 0.9s ease both;
+  content: "";
+}
+
+/* the fade lives on the faces: opacity on .leaf itself would flatten the 3d and show both sides */
+.leaf.is-away .leaf-face {
+  animation: fade-late 0.9s linear both;
+}
+
+.leaf.is-back .leaf-face {
+  animation: fade-early 0.9s linear both;
+}
+
+@keyframes turn-away {
+  from { transform: rotateY(0); }
+  to { transform: rotateY(-180deg); }
+}
+
+@keyframes turn-back {
+  from { transform: rotateY(-180deg); }
+  to { transform: rotateY(0); }
+}
+
+/* the turned-over page fades as it lands flat off to the left of the binder */
+@keyframes fade-late {
+  85% { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes fade-early {
+  from { opacity: 0; }
+  15% { opacity: 1; }
+}
+
+@keyframes shade {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
 }
 
 .page {
   position: relative;
   min-height: calc(100vh - 160px);
+  /* opening a #about link makes the browser jump to the section, which tucked its title under
+     the nav; this much margin means the jump always lands back at the top of the page */
+  scroll-margin-top: 100vh;
 }
 
 .page.is-shown > * {
@@ -384,6 +539,11 @@ main {
 .page.is-shown > *:nth-child(2) { animation-delay: 0.06s; }
 .page.is-shown > *:nth-child(3) { animation-delay: 0.12s; }
 .page.is-shown > *:nth-child(4) { animation-delay: 0.18s; }
+
+/* turned back to: the page arrived already laid out on the leaf, so don't replay the rise */
+.page.is-shown.is-turned > * {
+  animation: none;
+}
 
 @keyframes rise {
   from {
@@ -485,6 +645,8 @@ h2 {
   display: block;
   width: 100%;
   height: auto;
+  /* rounded corners in css, not an svg clipPath: the page-turn copy can't reach a clipPath on a hidden page */
+  clip-path: inset(0 round 4.7%);
   transition:
     opacity 0.8s ease 0.3s,
     transform 0.8s var(--squish) 0.3s;
@@ -567,7 +729,7 @@ body.is-loading .photo {
 .motto blockquote {
   margin: 0;
   padding-left: 16px;
-  border-left: 3px solid var(--pink-soft);
+  border-left: 3px solid var(--bar); /* same pink as the music player bar */
   font-size: clamp(20px, 2.4vw, 26px);
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -584,7 +746,7 @@ body.is-loading .photo {
 /* matches the "a note to self" label */
 .player-label {
   margin: 0 0 8px;
-  color: var(--mauve);
+  color: var(--ink);
   font-family: var(--sans);
   font-size: 15px;
   font-weight: 600;
@@ -822,7 +984,7 @@ body.is-loading .photo {
 .cards {
   display: grid;
   /* fill, not fit: a lone card stays card-sized instead of stretching full width */
-  grid-template-columns: repeat(auto-fill, minmax(240px, 320px));
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 320px));
   gap: 28px;
 }
 
@@ -1094,6 +1256,39 @@ body.is-loading .photo {
 /* ---------- responsive ---------- */
 
 @media (max-width: 820px) {
+  main {
+    --sheet-pad: 40px 16px 64px 46px;
+    margin: 12px 12px 40px 16px;
+  }
+
+  .binder {
+    left: -10px;
+    width: 40px;
+  }
+
+  .rings {
+    top: 36px;
+    gap: 28px;
+  }
+
+  .ring:nth-child(3n + 4) {
+    margin-top: 220px;
+  }
+
+  .binder::before {
+    width: 10px;
+  }
+
+  .ring {
+    width: 38px;
+    height: 10px;
+  }
+
+  .ring::after {
+    width: 14px;
+    height: 14px;
+  }
+
   .hero {
     justify-items: center;
   }

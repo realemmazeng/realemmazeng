@@ -100,6 +100,17 @@
     </header>
 
     <main>
+      <!-- rings in groups of three down the spine; longer pages just show more of them -->
+      <div class="binder" aria-hidden="true">
+        <div class="rings">
+          <span class="ring"></span><span class="ring"></span><span class="ring"></span>
+          <span class="ring"></span><span class="ring"></span><span class="ring"></span>
+          <span class="ring"></span><span class="ring"></span><span class="ring"></span>
+          <span class="ring"></span><span class="ring"></span><span class="ring"></span>
+          <span class="ring"></span><span class="ring"></span><span class="ring"></span>
+        </div>
+      </div>
+
       <!-- HOME -->
       <section class="page is-shown" id="home" aria-labelledby="home-title">
         <div class="hero">
@@ -108,11 +119,8 @@
 
           <div class="photo-frame">
             <svg class="photo" viewBox="0 0 300 300" role="img" aria-label="photo of emma">
-              <defs>
-                <clipPath id="id-round"><rect width="300" height="300" rx="14" /></clipPath>
-              </defs>
               <image href="assets/pfp.jpg" width="300" height="300" preserveAspectRatio="xMidYMid slice"
-                clip-path="url(#id-round)" filter="url(#cool)" />
+                filter="url(#cool)" />
             </svg>
 
             <h1 id="home-title" class="script">Emma Zeng</h1>
@@ -176,7 +184,7 @@
 
         <!-- little music player; the song list lives in PLAYLIST in script.js -->
         <div class="player" id="player" hidden>
-          <p class="player-label">my fall picks</p>
+          <p class="player-label">Fall picks</p>
           <div class="player-bar">
             <button class="pl-btn" type="button" data-pl="prev" aria-label="previous song">
               <svg viewBox="0 0 24 24"><path d="M11 6v12L2 12zM21 6v12l-9-6z" /></svg>
