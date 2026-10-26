@@ -31,18 +31,31 @@ function runLoader() {
       loader.classList.add("is-done");
       document.body.classList.remove("is-loading");
       dropStars();
-      writeName();
+      popName();
     }, 450);
   };
   requestAnimationFrame(tick);
 }
 
-// plays once; afterwards the mask comes off, so returning to home (or the page-turn copy) doesn't redraw it
-function writeName() {
+// splits the name into letters and pops them in once; afterwards the animation comes off,
+// so returning to home (or the page-turn copy) doesn't replay it
+function popName() {
   const name = document.getElementById("home-title");
   if (document.getElementById("home").hidden) return;
-  name.classList.add("is-writing");
-  name.addEventListener("animationend", () => name.classList.remove("is-writing"), { once: true });
+  const text = name.textContent;
+  name.setAttribute("aria-label", text);
+  name.textContent = "";
+  [...text].forEach((ch, i) => {
+    const letter = document.createElement("span");
+    letter.className = "letter";
+    letter.setAttribute("aria-hidden", "true");
+    letter.style.setProperty("--i", i);
+    letter.textContent = ch;
+    name.appendChild(letter);
+  });
+  name.classList.add("is-popping");
+  const last = name.lastElementChild;
+  last.addEventListener("animationend", () => name.classList.remove("is-popping"), { once: true });
 }
 
 /* ---------- floating gummy stars ---------- */
