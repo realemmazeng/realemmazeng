@@ -21,7 +21,7 @@
   --bg-glow-a: #fdeef3;
   --bg-glow-b: #f4ecf8;
   --sheet: #fffdfb; /* the binder page everything sits on */
-  --tab: #dfc6c8; /* active nav tab: the washed-out dusty rose */
+  --tab: #ecddde; /* active nav tab: the dusty rose, lightened toward white */
   color-scheme: light;
   --script: "Pinyon Script", "Snell Roundhand", cursive;
   --sans: "Inter Tight", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -601,7 +601,7 @@ h2 {
   isolation: isolate; /* lets the bears sit behind the text with z-index:-1 */
 }
 
-/* bear decorations: behind everything in the hero, bobbing gently */
+/* puppy doodles: behind everything in the hero, bobbing gently */
 .bear {
   position: absolute;
   z-index: -1;
@@ -611,19 +611,17 @@ h2 {
 }
 
 .bear-a {
-  top: 6%;
-  right: 4%;
-  width: clamp(80px, 9vw, 120px);
-  --tilt: 8deg;
+  top: -2%;
+  right: 3%;
+  width: clamp(100px, 11vw, 150px);
+  --tilt: 6deg;
 }
 
-/* mirrored so the two face each other */
 .bear-b {
-  right: 16%;
-  bottom: 4%;
-  width: clamp(64px, 7vw, 96px);
-  --tilt: -6deg;
-  --flip: -1;
+  right: 15%;
+  bottom: 2%;
+  width: clamp(90px, 10vw, 136px);
+  --tilt: -5deg;
   animation-delay: -1.8s;
 }
 
@@ -1358,8 +1356,23 @@ body.is-loading .photo {
     height: 14px;
   }
 
+  /* room above and below the content so the puppies never hide behind the photo or buttons */
   .hero {
     justify-items: center;
+    padding-top: 110px;
+    padding-bottom: 120px;
+  }
+
+  .bear-a {
+    top: 0;
+    right: 2%;
+    width: 100px;
+  }
+
+  .bear-b {
+    right: 6%;
+    bottom: 0;
+    width: 96px;
   }
 
   /* the photo is square, so its height is the frame's width (100cqw) */
