@@ -442,7 +442,8 @@ document.addEventListener("click", (e) => {
   videoFrame.hidden = isFile;
   videoModal.showModal();
   if (isFile) {
-    videoFile.src = src;
+    // already buffered by preloadVideo(): reassigning src would throw that away
+    if (videoFile.getAttribute("src") !== src) videoFile.src = src;
     videoFile.play().catch(() => {}); // the click counts as a user gesture, so sound is allowed
   } else {
     videoFrame.src = src;
@@ -454,13 +455,20 @@ videoModal.addEventListener("click", (e) => {
   if (e.target === videoModal || e.target.closest(".video-close")) videoModal.close();
 });
 
-// clearing src stops playback when the pop-up closes (esc included)
+// stop playback when the pop-up closes (esc included); the file stays loaded so it replays instantly
 videoModal.addEventListener("close", () => {
   videoFrame.src = "";
   videoFile.pause();
-  videoFile.removeAttribute("src");
-  videoFile.load();
+  videoFile.currentTime = 0;
 });
+
+// download the first demo video as soon as the site opens, so a click on the card plays it right away
+function preloadVideo() {
+  const link = document.querySelector('[data-video$=".mp4"], [data-video$=".webm"], [data-video$=".mov"]');
+  if (!link || videoFile.getAttribute("src")) return;
+  videoFile.preload = "auto";
+  videoFile.src = link.dataset.video;
+}
 
 /* ---------- start ---------- */
 
@@ -474,6 +482,9 @@ if (startHash && document.getElementById(startHash)?.classList.contains("page"))
   setActive(startHash);
 }
 
+// after the rest of the page, so the video doesn't slow down the first load
+if (document.readyState === "complete") preloadVideo();
+else window.addEventListener("load", preloadVideo, { once: true });
 loadArt();
 setupPlayer();
 runLoader();

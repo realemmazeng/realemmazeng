@@ -1079,7 +1079,32 @@ body.is-loading .photo {
   font-size: 11px;
 }
 
+/* the title link stretches over the whole card, so clicking anywhere plays the demo video */
+.card-main {
+  color: inherit;
+  text-decoration: none;
+}
+
+.card-main::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  content: "";
+}
+
+.card-main:focus-visible {
+  outline: none;
+}
+
+.card:has(.card-main:focus-visible) {
+  outline: 2px dashed var(--pink-deep);
+  outline-offset: 4px;
+}
+
+/* the github / demo links sit above the stretched link so they still work on their own */
 .card-links {
+  position: relative;
+  z-index: 2;
   display: flex;
   gap: 16px;
 }
