@@ -1,2 +1,4 @@
 .DS_Store
 .claude/
+tools/pinterest/.env
+tools/pinterest/data/

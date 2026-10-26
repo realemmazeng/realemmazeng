@@ -7,10 +7,79 @@
   --lilac: #e7c6f0;
   --ink: #2b2526;
   --ink-soft: #6f6567;
+  --mauve: #8c6b70; /* darker take on the player bar's gray-pink, for captions */
+  --name: #fce1e7; /* the big script name over the photo */
+  --surface: #fff; /* cards, buttons, panels */
+  --glass: rgba(255, 255, 255, 0.75); /* frosted nav */
+  --glass-strong: rgba(255, 255, 255, 0.92);
+  --line: rgba(43, 37, 38, 0.08);
+  --hover: rgba(43, 37, 38, 0.05);
+  --bar: #f5e8e7; /* music player controls */
+  --bar-hover: rgba(255, 255, 255, 0.7); /* player buttons on the gray-pink bar */
+  --shadow: rgba(43, 37, 38, 0.08);
+  --glow-pink: rgba(229, 141, 184, 0.15);
+  --tape: rgba(243, 214, 224, 0.75);
+  --bg-glow-a: #fdeef3;
+  --bg-glow-b: #f4ecf8;
+  --jelly-off: #e8e3e4;
+  color-scheme: light;
   --script: "Pinyon Script", "Snell Roundhand", cursive;
   --sans: "Inter Tight", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --mono: "DM Mono", ui-monospace, Menlo, monospace;
   --squish: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1b1618;
+    --blush: #2e2528;
+    --pink: #c9799f;
+    --pink-deep: #f0a3c8;
+    --pink-soft: #4a2e3b;
+    --lilac: #5a4563;
+    --ink: #f4eaec;
+    --ink-soft: #b9a9ad;
+    --mauve: #c9a5ab;
+    --surface: #262023;
+    --glass: rgba(38, 32, 35, 0.75);
+    --glass-strong: rgba(38, 32, 35, 0.92);
+    --line: rgba(244, 234, 236, 0.1);
+    --hover: rgba(244, 234, 236, 0.07);
+  --bar: #d9b0bc;
+    --shadow: rgba(0, 0, 0, 0.35);
+    --glow-pink: rgba(240, 163, 200, 0.12);
+    --tape: rgba(240, 163, 200, 0.35);
+    --bg-glow-a: #2a1c23;
+    --bg-glow-b: #221c2b;
+    --jelly: #7a4d61;
+    --jelly-off: #3a3134;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #1b1618;
+  --blush: #2e2528;
+  --pink: #c9799f;
+  --pink-deep: #f0a3c8;
+  --pink-soft: #4a2e3b;
+  --lilac: #5a4563;
+  --ink: #f4eaec;
+  --ink-soft: #b9a9ad;
+  --mauve: #c9a5ab;
+  --surface: #262023;
+  --glass: rgba(38, 32, 35, 0.75);
+  --glass-strong: rgba(38, 32, 35, 0.92);
+  --line: rgba(244, 234, 236, 0.1);
+  --hover: rgba(244, 234, 236, 0.07);
+  --bar: #d9b0bc;
+  --shadow: rgba(0, 0, 0, 0.35);
+  --glow-pink: rgba(240, 163, 200, 0.12);
+  --tape: rgba(240, 163, 200, 0.35);
+  --bg-glow-a: #2a1c23;
+  --bg-glow-b: #221c2b;
+  --jelly: #7a4d61;
+  --jelly-off: #3a3134;
+  color-scheme: dark;
 }
 
 * {
@@ -26,8 +95,8 @@ body {
 body {
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 12% 18%, #fdeef3 0, transparent 38%),
-    radial-gradient(circle at 88% 82%, #f4ecf8 0, transparent 40%),
+    radial-gradient(circle at 12% 18%, var(--bg-glow-a) 0, transparent 38%),
+    radial-gradient(circle at 88% 82%, var(--bg-glow-b) 0, transparent 40%),
     var(--paper);
   color: var(--ink);
   font-family: var(--sans);
@@ -54,6 +123,16 @@ img {
 /* custom props inherit into <use> clones, plain selectors don't */
 :root {
   --jelly: #f7d0de;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --jelly: #7a4d61;
+  }
+}
+
+:root[data-theme="dark"] {
+  --jelly: #7a4d61;
 }
 
 /* ---------- intro loader ---------- */
@@ -97,7 +176,7 @@ img {
 
 .loader-text {
   margin: 4px 0 18px;
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 13px;
   letter-spacing: 0.04em;
 }
@@ -131,7 +210,7 @@ img {
 }
 
 .loader-stars svg:not(.lit) {
-  --jelly: #e8e3e4;
+  --jelly: var(--jelly-off);
 }
 
 .loader-stars svg.lit {
@@ -215,12 +294,12 @@ img {
   justify-content: center;
   gap: 4px;
   padding: 6px;
-  border: 1px solid rgba(43, 37, 38, 0.08);
+  border: 1px solid var(--line);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--glass);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 4px 20px rgba(229, 141, 184, 0.15);
+  box-shadow: 0 4px 20px var(--glow-pink);
 }
 
 .nav-btn {
@@ -228,7 +307,7 @@ img {
   border: 0;
   border-radius: 999px;
   background: transparent;
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 13px;
   transition:
     background 0.25s ease,
@@ -243,6 +322,44 @@ img {
 
 .nav-btn.is-active {
   background: var(--pink-soft);
+}
+
+/* sun/moon theme switch at the end of the nav */
+.theme-btn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  padding: 0;
+}
+
+.theme-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* show the moon in light mode (tap for dark) and the sun in dark mode (tap for light) */
+.theme-btn .i-sun,
+:root[data-theme="dark"] .theme-btn .i-moon {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-btn .i-sun {
+  display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-btn .i-moon {
+    display: none;
+  }
+
+  :root:not([data-theme="light"]) .theme-btn .i-sun {
+    display: block;
+  }
 }
 
 /* ---------- pages ---------- */
@@ -386,7 +503,7 @@ body.is-loading .photo {
   z-index: 2;
   width: 90px;
   height: 26px;
-  background: rgba(243, 214, 224, 0.75);
+  background: var(--tape);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
@@ -404,7 +521,7 @@ body.is-loading .photo {
   letter-spacing: 0;
   white-space: nowrap;
   /* light pink; the shadow keeps it readable over the pale page */
-  color: var(--pink-soft);
+  color: var(--name);
   text-shadow: 0 1px 2px rgba(120, 60, 85, 0.25);
   pointer-events: none;
 }
@@ -440,9 +557,11 @@ body.is-loading .photo {
 
 .motto figcaption {
   margin-bottom: 8px;
-  color: var(--pink-deep);
-  font-family: var(--mono);
-  font-size: 12px;
+  color: var(--mauve);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .motto blockquote {
@@ -455,15 +574,175 @@ body.is-loading .photo {
   line-height: 1.35;
 }
 
+/* ---------- music player ---------- */
+
+.player {
+  max-width: 420px;
+  margin-bottom: 24px;
+}
+
+/* matches the "a note to self" label */
+.player-label {
+  margin: 0 0 8px;
+  color: var(--mauve);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* pink with dark icons in both themes (a deeper pink in dark mode) */
+.player-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: var(--bar);
+}
+
+.pl-gap {
+  flex: 1;
+}
+
+.pl-btn {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #2b2526;
+  transition:
+    background 0.2s ease,
+    transform 0.3s var(--squish);
+}
+
+.pl-btn:hover {
+  background: var(--bar-hover);
+  transform: scale(1.08);
+}
+
+.pl-btn:focus-visible {
+  outline: 2px dashed var(--pink-deep);
+  outline-offset: 2px;
+}
+
+.pl-btn svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.pl-play svg {
+  width: 28px;
+  height: 28px;
+}
+
+.pl-play .i-pause,
+.player.is-playing .pl-play .i-play {
+  display: none;
+}
+
+.player.is-playing .pl-play .i-pause {
+  display: block;
+}
+
+.pl-mute[aria-pressed="true"] .i-wave {
+  display: none;
+}
+
+.player-list {
+  max-height: 290px;
+  margin: 6px 0 0;
+  padding: 6px;
+  border-radius: 16px;
+  background: var(--surface); /* solid, so the floating stars don't show through the songs */
+  overflow-y: auto;
+  list-style: none;
+}
+
+.player-list[hidden] {
+  display: none;
+}
+
+.pl-track {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 6px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  text-align: left;
+  transition: background 0.2s ease;
+}
+
+.pl-track:hover,
+.pl-track.is-current {
+  background: var(--hover);
+}
+
+.pl-track:focus-visible {
+  outline: 2px dashed var(--pink-deep);
+  outline-offset: -2px;
+}
+
+.pl-cover {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 8px;
+  background: var(--pink-soft);
+  object-fit: cover;
+}
+
+.pl-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pl-title,
+.pl-artist {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.pl-title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.pl-track.is-current .pl-title {
+  color: var(--pink-deep);
+}
+
+.pl-artist {
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.pl-time {
+  flex: none;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
 .now-playing {
   display: flex;
   align-items: center;
   gap: 14px;
   max-width: 420px;
   padding: 12px;
-  border: 1px solid rgba(43, 37, 38, 0.08);
+  border: 1px solid var(--line);
   border-radius: 14px;
-  background: #fff;
+  background: var(--surface);
 }
 
 /* [hidden] has to win over display:flex above */
@@ -487,7 +766,7 @@ body.is-loading .photo {
 .np-label {
   margin: 0 0 2px;
   color: var(--pink-deep);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 11px;
 }
 
@@ -534,7 +813,7 @@ body.is-loading .photo {
 .sign-off {
   margin: 40px 0 0;
   color: var(--ink-soft);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 13px;
 }
 
@@ -550,8 +829,8 @@ body.is-loading .photo {
 .card {
   position: relative;
   padding: 14px 14px 18px;
-  background: #fff;
-  box-shadow: 0 14px 40px rgba(43, 37, 38, 0.08);
+  background: var(--surface);
+  box-shadow: 0 14px 40px var(--shadow);
   transform: rotate(var(--tilt));
   transition: transform 0.45s var(--squish);
 }
@@ -577,7 +856,7 @@ body.is-loading .photo {
 .card .card-meta {
   margin: 12px 0 0;
   color: var(--pink-deep);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 11px;
 }
 
@@ -594,7 +873,7 @@ body.is-loading .photo {
 }
 
 .card .card-tech {
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 11px;
 }
 
@@ -605,13 +884,163 @@ body.is-loading .photo {
 
 .card-link {
   color: var(--pink-deep);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 12px;
   text-decoration: none;
 }
 
 .card-link:hover {
   text-decoration: underline;
+}
+
+/* ---------- art (about page, pinterest stats) ---------- */
+
+.art {
+  margin-bottom: 28px;
+}
+
+/* the about page's bold one-liners (drawing, photobooth) */
+.art-note,
+.about-line {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* the pink "draw" word that opens the art */
+.about-line {
+  margin-bottom: 28px;
+}
+
+.about-link {
+  color: var(--pink-deep);
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+.about-link:hover {
+  text-decoration-style: solid;
+}
+
+.about-link:focus-visible {
+  outline: 2px dashed var(--pink-deep);
+  outline-offset: 3px;
+}
+
+.art-toggle {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--pink-deep);
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+.art-toggle:hover,
+.art-toggle[aria-expanded="true"] {
+  text-decoration-style: solid;
+}
+
+.art-toggle:focus-visible {
+  outline: 2px dashed var(--pink-deep);
+  outline-offset: 3px;
+}
+
+.art-grid:not([hidden]) {
+  animation: rise 0.6s var(--squish) both;
+}
+
+/* masonry: columns let tall and wide pieces keep their own shapes */
+.art-grid {
+  max-width: 760px;
+  margin-top: 18px;
+  columns: 200px;
+  column-gap: 22px;
+}
+
+.art-piece {
+  position: relative;
+  display: block;
+  margin-bottom: 22px;
+  padding: 10px;
+  background: var(--surface);
+  box-shadow: 0 14px 40px var(--shadow);
+  break-inside: avoid;
+  transform: rotate(var(--tilt));
+  transition: transform 0.45s var(--squish);
+}
+
+.art-piece:hover,
+.art-piece:focus-visible {
+  transform: rotate(0) translateY(-6px) scale(1.02);
+}
+
+.art-piece:focus-visible {
+  outline: 2px dashed var(--pink-deep);
+  outline-offset: 3px;
+}
+
+.art-piece img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.art-caption {
+  margin: 10px 0 2px;
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* stats pill slides up over the bottom of the image */
+.art-stats {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  left: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 14px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: var(--glass-strong);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 4px 14px rgba(229, 141, 184, 0.25);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 12px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.35s var(--squish);
+}
+
+.art-piece:hover .art-stats,
+.art-piece:focus-visible .art-stats {
+  opacity: 1;
+  transform: none;
+}
+
+.art-stats b {
+  color: var(--pink-deep);
+  font-weight: 600;
+}
+
+/* phones can't hover, so the stats just stay visible */
+@media (hover: none) {
+  .art-stats {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* visible outline when moving through the page with the keyboard */
@@ -638,10 +1067,10 @@ body.is-loading .photo {
   gap: 10px;
   padding: 8px 18px 8px 8px;
   border-radius: 999px;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(43, 37, 38, 0.08);
+  background: var(--surface);
+  box-shadow: 0 4px 12px var(--shadow);
   color: var(--ink);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 13px;
   text-decoration: none;
   transition: transform 0.35s var(--squish);
@@ -669,8 +1098,15 @@ body.is-loading .photo {
     justify-items: center;
   }
 
-  /* no room to overflow on a phone, so tuck the name back onto the photo */
+  /* the photo is square, so its height is the frame's width (100cqw) */
+  .photo-frame {
+    container-type: inline-size;
+  }
+
+  /* no room to overflow on a phone, so tuck the name back onto the photo's bottom edge */
   .script {
+    top: calc(100cqw - 0.95em);
+    bottom: auto;
     left: auto;
     right: 0;
   }
@@ -681,7 +1117,6 @@ body.is-loading .photo {
     width: auto;
     margin-top: 18px;
   }
-
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -736,7 +1171,7 @@ body.is-loading .photo {
   z-index: 1;
   width: 36px;
   height: 36px;
-  border: 1px solid rgba(43, 37, 38, 0.1);
+  border: 1px solid var(--line);
   border-radius: 50%;
   background: var(--pink-soft);
   font-size: 20px;

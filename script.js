@@ -80,6 +80,16 @@ function dropStars() {
 
 let current = "home";
 
+function setActive(target) {
+  document.querySelectorAll(".nav-btn").forEach((b) => {
+    b.classList.toggle("is-active", b.dataset.go === target);
+  });
+  current = target;
+  if (target === "about") startMusic();
+  else stopMusic();
+  history.replaceState(null, "", target === "home" ? location.pathname : `#${target}`);
+}
+
 // every section is already on the page, so switching is instant (no loader needed)
 function go(target) {
   if (target === current) return;
@@ -92,14 +102,7 @@ function go(target) {
   void next.offsetWidth;
   next.classList.add("is-shown");
   window.scrollTo({ top: 0 });
-
-  document.querySelectorAll(".nav-btn").forEach((b) => {
-    b.classList.toggle("is-active", b.dataset.go === target);
-  });
-  current = target;
-  if (target === "about") startMusic();
-  else stopMusic();
-  history.replaceState(null, "", target === "home" ? location.pathname : `#${target}`);
+  setActive(target);
 }
 
 document.addEventListener("click", (e) => {
@@ -157,6 +160,212 @@ function stopMusic() {
   musicTimer = null;
 }
 
+/* ---------- art, on the about page (pinterest stats) ---------- */
+
+const compact = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
+
+async function loadArt() {
+  const grid = document.getElementById("artGrid");
+  try {
+    const res = await fetch("assets/art.json", { cache: "no-cache" });
+    if (!res.ok) throw new Error(res.status);
+    const art = await res.json();
+    if (!art.pins?.length) throw new Error("empty");
+
+    for (const pin of art.pins) {
+      // plain frames, not links: the art stays on this page instead of leading to the pinterest account
+      const a = document.createElement("div");
+      a.className = "art-piece";
+      a.style.setProperty("--tilt", `${rand(-2, 2)}deg`);
+
+      const img = document.createElement("img");
+      img.src = pin.image;
+      img.alt = pin.title;
+      img.loading = "lazy";
+      a.append(img);
+
+      // optional label under the piece, like writing on a polaroid
+      if (pin.caption) {
+        const cap = document.createElement("p");
+        cap.className = "art-caption";
+        cap.textContent = pin.caption;
+        a.append(cap);
+      }
+
+      if (pin.id) {
+        a.tabIndex = 0; // lets keyboard users reach the stats too
+        const stats = document.createElement("span");
+        stats.className = "art-stats";
+        stats.title = `last ${art.window_days} days on pinterest`;
+        stats.innerHTML = `
+          <span><b>${compact.format(pin.impressions)}</b> views</span>
+          <span><b>${compact.format(pin.saves)}</b> saves</span>
+          <span><b>${compact.format(pin.clicks)}</b> clicks</span>`;
+        a.append(stats);
+      }
+
+      grid.appendChild(a);
+    }
+    document.getElementById("art").hidden = false;
+  } catch {
+    // no art yet: the section just stays hidden
+  }
+}
+
+// clicking the pink "draw" shows or hides the art
+document.querySelector(".art-toggle").addEventListener("click", (e) => {
+  const grid = document.getElementById("artGrid");
+  grid.hidden = !grid.hidden;
+  e.currentTarget.setAttribute("aria-expanded", String(!grid.hidden));
+});
+
+/* ---------- music player (about page) ---------- */
+
+// pick the songs here. src = an audio file (e.g. "assets/music/song.mp3" or a preview link),
+// cover = album art. the player stays hidden while this list is empty.
+// these are apple's free 30-second previews (found via the itunes search api)
+const PLAYLIST = [
+  {
+    title: "Cyanide",
+    artist: "Daniel Caesar",
+    src: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f1/fc/a6/f1fca678-c68e-8853-0576-e3244288321a/mzaf_6850192022117389642.plus.aac.p.m4a",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/aa/16/83/aa1683e3-6b82-e14c-8c56-2dad38d3dd02/193483999333.jpg/200x200bb.jpg",
+  },
+  {
+    title: "Club Paradise",
+    artist: "Drake",
+    src: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/55/58/1e/55581e35-5df0-7d1e-9a33-f3cd12624323/mzaf_6620843008779799356.plus.aac.p.m4a",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/34/e5/46/34e546b6-94c9-960e-cd35-4f35ffcd6860/19UMGIM71794.rgb.jpg/200x200bb.jpg",
+  },
+  {
+    title: "Solar Eclipse",
+    artist: "Drake & Don Toliver",
+    src: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/9f/d3/6f/9fd36f93-027f-aef8-67cc-e9701f8cf4f5/mzaf_4702287322687146814.plus.aac.p.m4a",
+    cover: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/62/58/98/62589807-decc-d418-eb07-5060de9a2d3e/26UMGIM63617.rgb.jpg/200x200bb.jpg",
+  },
+];
+
+const player = document.getElementById("player");
+const audio = document.getElementById("playerAudio");
+const playerList = document.getElementById("playerList");
+let trackIdx = 0;
+
+const clock = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+
+function setupPlayer() {
+  if (!PLAYLIST.length) return;
+  PLAYLIST.forEach((song, i) => {
+    const li = document.createElement("li");
+    const btn = document.createElement("button");
+    btn.className = "pl-track";
+    btn.type = "button";
+    btn.dataset.track = i;
+
+    const cover = document.createElement("img");
+    cover.className = "pl-cover";
+    cover.alt = "";
+    if (song.cover) cover.src = song.cover;
+
+    const info = document.createElement("span");
+    info.className = "pl-info";
+    const title = document.createElement("span");
+    title.className = "pl-title";
+    title.textContent = song.title;
+    const artist = document.createElement("span");
+    artist.className = "pl-artist";
+    artist.textContent = song.artist;
+    info.append(title, artist);
+
+    const time = document.createElement("span");
+    time.className = "pl-time";
+    // read just the file header to learn the length, without downloading the song
+    const probe = new Audio();
+    probe.preload = "metadata";
+    probe.addEventListener("loadedmetadata", () => (time.textContent = clock(probe.duration)), { once: true });
+    probe.src = song.src;
+
+    btn.append(cover, info, time);
+    li.appendChild(btn);
+    playerList.appendChild(li);
+  });
+  loadTrack(0);
+  player.hidden = false;
+}
+
+function loadTrack(i) {
+  trackIdx = (i + PLAYLIST.length) % PLAYLIST.length;
+  audio.src = PLAYLIST[trackIdx].src;
+  playerList.querySelectorAll(".pl-track").forEach((b) => {
+    b.classList.toggle("is-current", Number(b.dataset.track) === trackIdx);
+  });
+}
+
+function playTrack(i) {
+  loadTrack(i);
+  audio.play().catch(() => {});
+}
+
+player.addEventListener("click", (e) => {
+  const track = e.target.closest("[data-track]");
+  if (track) {
+    const i = Number(track.dataset.track);
+    if (i === trackIdx) audio.paused ? audio.play() : audio.pause();
+    else playTrack(i);
+    return;
+  }
+  const btn = e.target.closest("[data-pl]");
+  if (!btn) return;
+  const action = btn.dataset.pl;
+  if (action === "play") audio.paused ? audio.play().catch(() => {}) : audio.pause();
+  else if (action === "prev") playTrack(audio.currentTime > 3 ? trackIdx : trackIdx - 1); // like most players: restart first
+  else if (action === "next") playTrack(trackIdx + 1);
+  else if (action === "mute") {
+    audio.muted = !audio.muted;
+    btn.setAttribute("aria-pressed", String(audio.muted));
+    btn.setAttribute("aria-label", audio.muted ? "unmute" : "mute");
+  } else if (action === "list") {
+    playerList.hidden = !playerList.hidden;
+    btn.setAttribute("aria-expanded", String(!playerList.hidden));
+  }
+});
+
+audio.addEventListener("play", () => {
+  player.classList.add("is-playing");
+  player.querySelector(".pl-play").setAttribute("aria-label", "pause");
+});
+audio.addEventListener("pause", () => {
+  player.classList.remove("is-playing");
+  player.querySelector(".pl-play").setAttribute("aria-label", "play");
+});
+audio.addEventListener("ended", () => playTrack(trackIdx + 1));
+
+/* ---------- light / dark theme ---------- */
+
+// no saved pick = follow the system setting; the nav button saves an explicit pick
+const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+const themeBtn = document.getElementById("themeBtn");
+const themeMeta = document.querySelector('meta[name="theme-color"]');
+
+const currentTheme = () => document.documentElement.dataset.theme || (systemDark.matches ? "dark" : "light");
+
+function syncTheme() {
+  const dark = currentTheme() === "dark";
+  themeBtn.setAttribute("aria-label", dark ? "switch to light mode" : "switch to dark mode");
+  themeMeta.content = getComputedStyle(document.documentElement).getPropertyValue("--paper").trim();
+}
+
+themeBtn.addEventListener("click", () => {
+  const next = currentTheme() === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  try {
+    localStorage.setItem("theme", next);
+  } catch {}
+  syncTheme();
+});
+
+systemDark.addEventListener("change", syncTheme);
+syncTheme();
+
 /* ---------- demo video pop-up ---------- */
 
 const videoModal = document.getElementById("videoModal");
@@ -203,11 +412,9 @@ if (startHash && document.getElementById(startHash)?.classList.contains("page"))
   const page = document.getElementById(startHash);
   page.hidden = false;
   page.classList.add("is-shown");
-  document.querySelectorAll(".nav-btn").forEach((b) => {
-    b.classList.toggle("is-active", b.dataset.go === startHash);
-  });
-  current = startHash;
-  if (startHash === "about") startMusic();
+  setActive(startHash);
 }
 
+loadArt();
+setupPlayer();
 runLoader();
